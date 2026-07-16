@@ -1,0 +1,56 @@
+@Library('shared') _
+
+pipeline {
+    agent {
+        label 'ec2'
+    }
+
+    stages {
+
+        stage('hello') {
+            steps {
+                script {
+                    hello()
+                }
+            }
+        }
+
+        stage('code') {
+            steps {
+                script {
+                    gitClone(
+                        'main',
+                        'https://github.com/LondheShubham153/django-notes-app'
+                    )
+                }
+            }
+        }
+
+        stage('build') {
+            steps {
+                script {
+                    docker_build("notes-app", "latest","lostcode160")
+                }
+                
+            }
+        }
+
+        stage('test') {
+            steps {
+                echo 'this the test stage'
+            }
+        }
+
+        stage('push') {
+            steps {
+              script{docker_push("notes-app", "latest","lostcode160")}
+            }
+        }
+
+        stage('deploy') {
+            steps {
+                script{docker_compose()}
+            }
+        }
+    }
+}
